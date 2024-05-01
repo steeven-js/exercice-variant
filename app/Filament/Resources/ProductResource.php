@@ -2,16 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
+use App\Models\Sku;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Product;
+use Filament\Forms\Form;
+use App\Models\Attribute;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Filament\Resources\SkuResource;
+use Filament\Forms\Components\Repeater;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Actions\Action;
+use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
@@ -23,11 +28,20 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
+                Forms\Components\Section::make('Rate limiting')
+                    ->description('Prevent abuse by limiting the number of requests per period')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('description')
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\Section::make('Skus')
+                    ->description('Prevent abuse by limiting the number of requests per period')
+                    ->schema([
+                        static::getItemsRepeater(),
+                    ]),
             ]);
     }
 
@@ -73,5 +87,56 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    public static function getItemsRepeater(): Repeater
+    {
+        return Repeater::make('skus')
+            ->relationship()
+            ->schema([
+                Forms\Components\TextInput::make('product_id')
+                    ->dehydrated()
+                    ->hidden(),
+
+                Forms\Components\TextInput::make('sku')
+                    ->label('Sku')
+                    ->required()
+                    ->columnSpan([
+                        'md' => 3,
+                    ]),
+
+                Forms\Components\TextInput::make('unit_amount')
+                    ->label('Unit Price')
+                    ->dehydrated()
+                    ->numeric()
+                    ->required()
+                    ->columnSpan([
+                        'md' => 3,
+                    ]),
+            ])
+            ->extraItemActions([
+                Action::make('openProduct')
+                    ->tooltip('Open product')
+                    ->icon('heroicon-m-arrow-top-right-on-square')
+                    ->url(function (array $arguments, Repeater $component): ?string {
+                        $itemData = $component->getRawItemState($arguments['item']);
+
+                        $sku = Sku::find($itemData['id']);
+
+                        if (!$sku) {
+                            return null;
+                        }
+
+                        return SkuResource::getUrl('edit', ['record' => $sku]);
+                    }, shouldOpenInNewTab: true)
+                    ->hidden(fn (array $arguments, Repeater $component): bool => blank($component->getRawItemState($arguments['item'])['product_id'])),
+            ])
+            ->orderColumn('sort')
+            ->defaultItems(1)
+            ->hiddenLabel()
+            ->columns([
+                'md' => 10,
+            ])
+            ->required();
     }
 }

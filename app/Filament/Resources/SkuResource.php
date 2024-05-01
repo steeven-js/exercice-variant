@@ -23,16 +23,41 @@ class SkuResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('product_id')
-                    ->relationship('product', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('sku')
-                    ->label('SKU')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('unit_amount')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Section::make('Rate limiting')
+                    ->description('Prevent abuse by limiting the number of requests per period')
+                    ->schema([
+                        Forms\Components\Select::make('product_id')
+                            ->relationship('product', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('sku')
+                            ->label('SKU')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('unit_amount')
+                            ->required()
+                            ->numeric(),
+                    ]),
+                Forms\Components\Section::make('Rate limiting')
+                    ->description('Prevent abuse by limiting the number of requests per period')
+                    ->schema([
+                        Forms\Components\Repeater::make('attributes')
+                            ->schema([
+                                Forms\Components\Select::make('status')
+                                    ->options([
+                                        'member' => 'Member',
+                                        'administrator' => 'Administrator',
+                                        'owner' => 'Owner',
+                                    ]),
+                                Forms\Components\Select::make('role')
+                                    ->options([
+                                        'member' => 'Member',
+                                        'administrator' => 'Administrator',
+                                        'owner' => 'Owner',
+                                    ])
+                                    ->required(),
+                            ])
+                            ->columns(2)
+                    ]),
             ]);
     }
 
@@ -74,7 +99,8 @@ class SkuResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            'product' => RelationManagers\ProductRelationManager::class,
+            'attributes' => RelationManagers\AttributesRelationManager::class,
         ];
     }
 

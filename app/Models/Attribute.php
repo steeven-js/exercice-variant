@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\AttributeSku;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Attribute extends Model
@@ -24,11 +26,9 @@ class Attribute extends Model
 
     public const COLOUR = 'colour';
 
-    public function skus(): BelongsToMany
+    public function skus(): HasMany
     {
-        return $this->belongsToMany(Sku::class)
-            ->using(AttributeSku::class)
-            ->withPivot('id', 'value');
+        return $this->hasMany(AttributeSku::class, 'attribute_id');
     }
 
     public function product(): BelongsTo

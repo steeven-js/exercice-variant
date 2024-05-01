@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SkuResource\Pages;
 use App\Filament\Resources\SkuResource\RelationManagers;
+use App\Models\Attribute;
 use App\Models\Sku;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -37,24 +38,19 @@ class SkuResource extends Resource
                             ->required()
                             ->numeric(),
                     ]),
-                Forms\Components\Section::make('Rate limiting')
-                    ->description('Prevent abuse by limiting the number of requests per period')
+                Forms\Components\Section::make('Variants')
+                    ->description('Variants of the product')
                     ->schema([
-                        Forms\Components\Repeater::make('attributes')
+                        Forms\Components\Repeater::make('items')
+                            ->relationship()
                             ->schema([
-                                Forms\Components\Select::make('status')
-                                    ->options([
-                                        'member' => 'Member',
-                                        'administrator' => 'Administrator',
-                                        'owner' => 'Owner',
-                                    ]),
-                                Forms\Components\Select::make('role')
-                                    ->options([
-                                        'member' => 'Member',
-                                        'administrator' => 'Administrator',
-                                        'owner' => 'Owner',
-                                    ])
+                                Forms\Components\Select::make('attribute_id')
+                                    ->options(Attribute::query()->pluck('name', 'id'))
+                                    ->default(Attribute::query()->where('id', 1)->pluck('id')->first())
                                     ->required(),
+                                Forms\Components\TextInput::make('value')
+                                    ->required()
+                                    ->maxLength(255),
                             ])
                             ->columns(2)
                     ]),

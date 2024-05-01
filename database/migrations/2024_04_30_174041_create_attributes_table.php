@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('attribute_sku', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('attribute_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('sku_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('attribute_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('sku_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('value');
             $table->timestamps();
         });

@@ -53,6 +53,7 @@ class SkuSeeder extends Seeder
             $sku = Sku::create([
                 'product_id' => $iphone15->id,
                 'sku' => $data['sku_code'],
+                'unit_amount' => 999.99,
             ]);
 
             foreach ($data['attributes'] as $attributeName => $attributeValue) {

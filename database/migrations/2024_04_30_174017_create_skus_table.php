@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedInteger('sort')->default(0);
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->string('sku')->unique();
-            $table->float('unit_amount');
+            $table->decimal('unit_amount', 10, 2)->nullable();
             $table->timestamps();
         });
     }

@@ -21,13 +21,8 @@ class Product extends Model
         return $this->hasMany(Sku::class);
     }
 
-    public function attributes(): HasMany
-    {
-        return $this->hasMany(Attribute::class);
-    }
-
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class, 'category_product', 'category_id', 'product_id')->withTimestamps();
     }
 }

@@ -1,54 +1,66 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Database\Seeders;
 
 use App\Models\Attribute;
 use App\Models\Product;
 use App\Models\Sku;
-use App\Repositories\ProductRepositoryInterface;
 use Illuminate\Database\Seeder;
 
 class SkuSeeder extends Seeder
 {
-    public function __construct(
-        private ProductRepositoryInterface $productRepository
-    ) {
-    }
-
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $colours = [
-            'red', 'green', 'blue'
+        // Création ou récupération des attributs
+        $sizeAttribute = Attribute::where('name', 'Size')->firstOrCreate(['name' => 'Size']);
+        $capacityAttribute = Attribute::where('name', 'Capacity')->firstOrCreate(['name' => 'Capacity']);
+        $colourAttribute = Attribute::where('name', 'Colour')->firstOrCreate(['name' => 'Colour']);
+
+        // Récupération de l'iPhone 15
+        $iphone15 = Product::where('name', 'Iphone 15')->first();
+
+        $skusData = [
+            [
+                'sku_code' => 'PB00570856',
+                'attributes' => [
+                    'Size' => 'Small',
+                    'Capacity' => '64GB',
+                    'Colour' => 'Black',
+                ],
+            ],
+            [
+                'sku_code' => 'PB00570857',
+                'attributes' => [
+                    'Size' => 'Medium',
+                    'Capacity' => '128GB',
+                    'Colour' => 'White',
+                ],
+            ],
+            [
+                'sku_code' => 'PB00570858',
+                'attributes' => [
+                    'Size' => 'Large',
+                    'Capacity' => '256GB',
+                    'Colour' => 'Gold',
+                ],
+            ],
         ];
 
-        $sizes = [
-            'small', 'medium', 'large'
-        ];
-
-        $tShirtProduct = $this->productRepository->findByName('T-Shirt');
-
-        for ($i = 0; $i <= 2; $i++) {
-            $tShirtSku = Sku::factory()->create([
-                'product_id' => $tShirtProduct->id,
-                'unit_amount' => 19.99
+        foreach ($skusData as $data) {
+            $sku = Sku::create([
+                'product_id' => $iphone15->id,
+                'sku' => $data['sku_code'],
             ]);
 
-            Attribute::where('product_id', $tShirtProduct->id)
-                ->colour()
-                ->first()
-                ->skus()
-                ->attach($tShirtSku->id, ['value' => $colours[$i]]);
-
-            Attribute::where('product_id', $tShirtProduct->id)
-                ->size()
-                ->first()
-                ->skus()
-                ->attach($tShirtSku->id, ['value' => $sizes[$i]]);
+            foreach ($data['attributes'] as $attributeName => $attributeValue) {
+                $attribute = Attribute::where('name', $attributeName)->first();
+                if ($attribute) {
+                    $sku->attributes()->attach($attribute->id, ['value' => $attributeValue]);
+                }
+            }
         }
     }
 }

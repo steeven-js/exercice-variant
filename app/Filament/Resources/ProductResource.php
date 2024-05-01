@@ -6,10 +6,12 @@ use App\Models\Sku;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Product;
+use App\Models\Category;
 use Filament\Forms\Form;
 use App\Models\Attribute;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
 use App\Filament\Resources\SkuResource;
 use Filament\Forms\Components\Repeater;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,13 +30,17 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Rate limiting')
-                    ->description('Prevent abuse by limiting the number of requests per period')
+                Forms\Components\Section::make('Product')
+                    ->description('Product details')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\Textarea::make('description')
+                        Forms\Components\Select::make('categories')
+                            ->relationship('categories', 'name')
+                            ->multiple()
+                            ->required(),
+                        Forms\Components\RichEditor::make('description')
                             ->columnSpanFull(),
                     ]),
                 Forms\Components\Section::make('Skus')

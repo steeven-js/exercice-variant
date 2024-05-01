@@ -16,11 +16,8 @@ return new class extends Migration
         Schema::create('attributes', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('sort')->default(0);
-            $table->string('name');
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->string('name')->unique();
             $table->timestamps();
-
-            $table->unique(['product_id', 'name']);
         });
     }
 

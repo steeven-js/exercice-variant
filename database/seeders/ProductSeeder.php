@@ -3,27 +3,22 @@
 namespace Database\Seeders;
 
 use App\Models\Product;
-use App\Repositories\CategoryRepositoryInterface;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
-    public function __construct(
-        private CategoryRepositoryInterface $categoryRepository
-    ) {
-    }
-
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $clothesCategory = $this->categoryRepository->findByName('Clothes');
-
         $product = Product::factory()->create([
-            'name' => 'T-Shirt'
+            'name' => 'Iphone 15',
+            'description' => 'The best smartphone ever',
         ]);
 
-        $clothesCategory->products()->attach($product);
+        $category = Category::where('name', 'Smartphones')->first();
+        $product->categories()->attach($category);
     }
 }

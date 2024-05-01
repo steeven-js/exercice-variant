@@ -13,7 +13,8 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         Category::factory()->create([
-            'name' => 'Clothes',
+            'name' => 'Smartphones',
+            'description' => 'The best smartphones in the world',
         ]);
     }
 }

@@ -2,36 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\SkuCollection;
-use App\Http\Resources\SkuResource;
+use App\Http\Controllers\Controller;
 use App\Models\Sku;
-use App\Repositories\SkuRepositoryInterface;
+use Illuminate\Http\Request;
 
 class SkuController extends Controller
 {
-    /**
-     * @param SkuRepositoryInterface $skuRepository
-     */
-    public function __construct(
-        public SkuRepositoryInterface $skuRepository
-    ) {
+    public function index()
+    {
+        // On récupère tous les utilisateurs
+        $skus = Sku::with('items')->get();
+
+        // On retourne les informations des utilisateurs en JSON
+        return response()->json($skus);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(): SkuCollection
+    public function show(Sku $sku)
     {
-        return new SkuCollection($this->skuRepository->all());
+        // On retourne les informations de l'utilisateur en JSON
+        return response()->json($sku);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param Sku $sku
-     */
-    public function show(Sku $sku): SkuResource
+    public function destroy(Sku $sku)
     {
-        return new SkuResource($this->skuRepository->find($sku->id));
+        // On supprime l'utilisateur
+        $sku->delete();
+
+        // On retourne la réponse JSON
+        return response()->json();
     }
 }

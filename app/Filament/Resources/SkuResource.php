@@ -96,7 +96,6 @@ class SkuResource extends Resource
     {
         return [
             'product' => RelationManagers\ProductRelationManager::class,
-            'attributes' => RelationManagers\AttributesRelationManager::class,
         ];
     }
 
